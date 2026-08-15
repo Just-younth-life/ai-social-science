@@ -609,4 +609,3 @@ function switchPage(page) {
         RankEngine.render();
     }
 }
-
