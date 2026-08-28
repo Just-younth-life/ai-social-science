@@ -1,5 +1,5 @@
 # ai-social-science
-0-1 landing of community science popularization OPC. Construct Shannbanqiao community multi-node AI science communication system, complete science video creation, IP material development and offline popular science workshop operation for resident safety popularization.
+0-1 landing of community science popularization OPC. Construct 杉板桥 community multi-node AI science communication system, complete science video creation, IP material development and offline popular science workshop operation for resident safety popularization.
 
 # 杉板桥社区科普OPC｜从0到1落地项目
 > Community Science Popularization OPC 0-1 Landing Project
