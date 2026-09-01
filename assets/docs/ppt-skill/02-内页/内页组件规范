@@ -1,1 +1,11 @@
+---
+skill_name: PPT通用内页组件规范
+skill_type: page_spec
+description: 目录页、图文页、要点列表、数据模块、多栏布局通用排版规则
+trigger_keywords: ["PPT内页","正文页","图文排版","要点模块","目录页"]
+compatible_skill: ["PPT封面首页规范","PPT封底规范","snippet碎片组件库","整套主题包"]
+conflict_skill: []
+usage_note: 定义页面骨架，主题包只会替换色彩与装饰，不改动页面结构
+---
+【正文写入各类内页版式规范】
 
