@@ -10,9 +10,9 @@
 
 3. 整套主题包（theme_package）：视觉皮肤，覆盖页面样式
 ‑ theme‑hulu‑guguo｜葫芦国潮贯穿式PPT整套主题
+‑ theme‑community‑popularize｜社区科普OPC政务汇报PPT整套主题
 
 ## 使用模式
 模式A【自由拼装】：页面规范 + snippet碎片，无专属主题
 模式B【主题一键加载】：启用一套theme主题包，自动美化全部页面骨架
 > 禁止同时加载多个theme_package
-
