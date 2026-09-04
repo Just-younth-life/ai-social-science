@@ -12,6 +12,8 @@
 - 形成“活动主题 → 海报视觉 → 传播文案 → 复盘沉淀”的完整闭环
 - 可纳入个人 AIPM作品集、Git 技能库或内容生成 SOP
 
+** 核心SKILL **
+A vibrant and colorful illustration of an Asian teenager wearing VR glasses, standing in the center with their back to the viewer as they play virtual reality games on holographic screens, surrounded by floating islands and futuristic buildings. The background is filled with surrealistic elements like flying cars and people interacting within digital worlds. Bright colors such as purple, orange, pink, blue, green, and yellow are used for contrast against the black backgrounds.
 ---
 
 ## 2. 海报生成规范
