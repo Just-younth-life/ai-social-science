@@ -1,6 +1,8 @@
 # ai-social-science
 0-1 landing of community science popularization OPC. Construct 杉板桥 community multi-node AI science communication system, complete science video creation, IP material development and offline popular science workshop operation for resident safety popularization.
 
+本项目采用 Wiki.js+Dify 搭建私有化科普知识库，实现科普海报文案、研学资料资产沉淀，并依托 RAG 实现智能问答；整套方案复用成熟开源组件，避免重复造轮子，低成本完成 CloudRise 工作台 AI 知识模块原型落地，完整覆盖内容生产→资产存储→向量检索→前端工作台调用全链路，作为 AIPM 多模态 AI 产品实战案例。
+
 # 杉板桥社区科普OPC｜从0到1落地项目
 > Community Science Popularization OPC 0-1 Landing Project
 
