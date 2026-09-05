@@ -1,0 +1,160 @@
+# Wiki.js + Dify 私有化部署 & API 对接文档
+
+> 
+> 项目定位：CloudRise 科普工作台｜文档资产沉淀 + RAG 智能问答联动
+> 软件授权：完全开源免费，无许可费用
+> 架构说明：Wiki.js 承载原始知识资产；Dify 提供 RAG / 大模型 API，不存储原稿
+
+## 1、环境前置条件
+
+1. 服务器 / 本机安装 Docker + Docker‑Compose
+2. 本地测试：PC（Windows11/Mac）；线上部署：2 核 4G 云服务器
+3. 开放端口：3000 (Wiki.js) / 8000 (Dify)
+
+> 
+> ⚠️软件不收钱，仅云服务器产生租金，本地电脑零开销
+
+## 2、Wiki.js docker‑compose.yml（文档知识库）
+
+新建`wiki-docker-compose.yml`
+
+```
+version: "3"
+services:
+  wiki:
+    image: requarks/wiki:2
+    container_name: wiki-js
+    restart: always
+    environment:
+      - DB_TYPE=postgres
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=wiki
+      - DB_PASSWORD=wikipassword
+      - DB_NAME=wiki
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    volumes:
+      - ./wiki-data:/wiki/data
+  db:
+    image: postgres:14-alpine
+    container_name: wiki-postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=wiki
+      - POSTGRES_PASSWORD=wikipassword
+      - POSTGRES_DB=wiki
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+```
+
+### 启动命令
+
+```
+docker-compose -f wiki-docker-compose.yml up -d
+```
+
+访问地址：`http://127.0.0.1:3000`
+首次打开完成管理员账号初始化。
+✅**文档存储位置**
+`./wiki-data`目录存放所有 Markdown 文案、图片、附件；数据库存在`postgres-data`，随时打包备份、迁移，资产自主可控。
+
+> 
+> 建议目录规划（科普研学资料）
+
+```
+科普海报文案库
+├─健康科普
+├─脑科学心理活动资料
+├─研学手册PDF原稿
+└─活动SOP&复盘文档
+```
+
+## 3、Dify docker‑compose.yml（RAG 向量问答引擎）
+
+新建`dify-docker-compose.yml`
+
+```
+version: '3.8'
+services:
+  dify:
+    image: langgenius/dify:latest
+    container_name: dify
+    restart: always
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./dify-data:/app/data
+    environment:
+      - KEY=your-admin-secret-key
+```
+
+### 启动命令
+
+```
+docker-compose -f dify-docker-compose.yml up -d
+```
+
+访问地址：`http://127.0.0.1:8000`
+
+1. 创建知识库
+2. 创建应用，开启 API 访问，复制 API_KEY（后续接入 CloudRise 工作台）
+
+> 
+> 向量索引存放于`./dify-data`，**不会保存 Wiki 完整原稿，仅建立检索碎片**。原稿始终托管在 Wiki.js。
+
+## 4、两种数据同步方案（重点，两种路线按需选择）
+
+### 方案 A：手动导入（原型测试｜作品集演示，最简单）
+
+1. 在 Wiki 导出 Markdown/PDF
+2. 将文件上传至 Dify 知识库
+3. Dify 自动文本分段、生成向量索引
+
+> 
+> 优点：零开发；缺点：文档更新后需要重新上传，适合一期 0‑1 原型
+
+### 方案 B：API 自动抓取（正式上线｜二期迭代）
+
+> 
+> 适用：Wiki 新增文档后，Dify 定时自动拉取更新向量库
+
+1. 开启 Wiki.js 内置 API，生成 Wiki 访问 Token
+2. 编写简易定时脚本调用 Wiki 接口，抓取新增页面
+3. 将新增文档推送至 Dify 知识库接口
+
+> 
+> 适合 CloudRise 长期运营，作为产品迭代亮点写入作品集
+
+## 5、对接 CloudRise 工作台 API 调用示例
+
+前端 / 工作台后端直接请求 Dify 对话接口，在工作台页面嵌入 AI 科普问答
+
+```
+POST http://127.0.0.1:8000/v1/chat-messages
+Authorization: Bearer {DIFY_API_KEY}
+Content-Type: application/json
+{
+    "inputs": {},
+    "query": "手机充电辐射会伤害人体吗？",
+    "response_mode": "blocking",
+    "conversation_id": ""
+}
+```
+
+工作台接收返回结果，展示 AI 答案并标注原文来源（Wiki 文档链接），形成**提问→检索知识库→返回科普内容→溯源原稿**完整闭环。
+
+## 6、费用清单整理
+
+1. Wiki.js、Dify 软件：开源免费，无用户 / 文档数量收费
+2. 本地电脑部署：**0 元，仅硬件资源消耗**（原型、作品集演示首选）
+3. 云服务器正式部署：仅服务器月租（低配 2 核 4G≈50~80 元 / 月），域名、备份硬盘为可选支出
+4. 无额外授权费，数据私有化，不会被第三方平台锁定资产
+
+## 7、落地三阶段产品路线
+
+阶段 1（0‑1 原型）：本地 Docker 部署，手动同步文档，接入工作台 API，完成可交互 Demo
+阶段 2（迭代优化）：开发定时自动同步脚本，增加知识库使用统计、高频问题收集
+阶段 3（成熟中台）：完善多租户、细粒度权限、知识生命周期管理，对接社区研学业务流程
