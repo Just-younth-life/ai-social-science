@@ -1,334 +1,81 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#66BB6A">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <title>启知 · 科普游戏</title>
-    <link rel="stylesheet" href="css/style.css">
-    <!-- LXGW WenKai 行楷字体（SIL OFL 1.1 开源） -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css" media="all">
-</head>
-<body class="theme-general">
-<!-- ============【新增1：登录注册弹窗DOM】============ -->
-<div class="login-mask" id="loginMask">
-    <div class="login-box">
-        <h2 id="loginTitle">账号登录</h2>
-        <div class="input-row">
-            <input type="tel" id="phoneInput" placeholder="请输入手机号">
-        </div>
-        <div class="input-row code-row">
-            <input type="text" id="codeInput" placeholder="验证码">
-            <button class="btn-get-code" id="btnSendCode">获取验证码</button>
-        </div>
-        <div class="input-row">
-            <input type="email" id="emailInput" placeholder="邮箱(选填，接收通知)">
-        </div>
-        <button class="btn-login" id="btnSubmitLogin">登录</button>
-        <div class="tab-switch">
-            <span id="switchLoginRegister">切换到注册账号</span>
-        </div>
-        <div class="login-tip-text">注册后管理员后台可查看新增注册用户</div>
-    </div>
-</div>
+<!-- head标签内引入Logto SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@logto/browser@2.20.0/dist/logto.browser.min.js"></script>
 
-    <!-- 背景层 -->
-    <div id="bgLayer"></div>
-
-    <!-- Toast 提示 -->
-    <div id="toast"></div>
-
-    <!-- 反馈层 -->
-    <div id="feedbackLayer"></div>
-
-    <!-- 拼图解锁弹窗层 -->
-    <div id="puzzleOverlay"></div>
-
-    <!-- 分享编辑器弹窗层 -->
-    <div id="shareOverlay"></div>
-
-    <!-- 排行榜网名编辑弹窗层 -->
-    <div id="rankOverlay"></div>
-
-<!-- ============【修改：主容器初始隐藏 app‑hide】============ -->
-    <div class="app-container app-hide" id="mainApp">
-        <!-- 顶部栏 -->
-        <header class="top-bar">
-            <div class="brand">
-                <div>
-                    <div class="brand-name">启知</div>
-                    <div class="brand-sub">你的生活科普社区</div>
-                </div>
-            </div>
-            <button class="btn-profile" id="btnProfile" aria-label="个人中心">👤</button>
-        </header>
-
-        <!-- 年龄段切换 -->
-        <nav class="audience-tabs" id="audienceTabs">
-            <button class="aud-tab active" data-audience="general">🌈 通用</button>
-            <button class="aud-tab" data-audience="youth">🧒 青少年</button>
-            <button class="aud-tab" data-audience="middle">💼 中青年</button>
-            <button class="aud-tab" data-audience="elderly">👴 老年</button>
-        </nav>
-
-        <!-- 吉祥物 -->
-        <section class="mascot-section">
-            <div id="mascotWrap"></div>
-            <div class="greeting-text">
-                今日已连续打卡 <span class="streak" id="streakDays">1</span> 天 ·
-                累计完成 <span class="streak" id="completedCount">0</span> 次
-            </div>
-        </section>
-
-        <!-- 主页面 -->
-        <main>
-            <!-- 首页 -->
-            <section class="page active" data-page="home">
-                <!-- 任务卡片 -->
-                <div class="card task-card" id="cardMain">
-                    <!-- 动态渲染 -->
-                </div>
-
-                <!-- 彩蛋卡片 -->
-                <div class="egg-card" id="eggCard">
-                    <!-- 动态渲染 -->
-                </div>
-
-                <!-- 统计快览 -->
-                <div class="home-stats">
-                    <div class="stat-box">
-                        <div class="stat-num" id="userLevel">Lv.1</div>
-                        <div class="stat-label">当前等级</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-num" id="userExp">0 经验</div>
-                        <div class="stat-label">可用余额</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-num" id="streakDays2">1</div>
-                        <div class="stat-label">连续天数</div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 发现页 · 知识碎片拼图 + 分享广场 -->
-            <section class="page" data-page="discover">
-                <div id="puzzleContainer"></div>
-                <div id="shareContainer"></div>
-            </section>
-
-            <!-- 排行榜页 -->
-            <section class="page" data-page="rank">
-                <div id="rankContainer"></div>
-            </section>
-
-            <!-- 个人中心页（原弹窗改为页面）-->
-            <section class="page" data-page="profile" id="profilePage">
-                <div class="profile-container">
-                    <!-- 用户卡片 -->
-                    <div class="user-card">
-                        <h3>启知用户</h3>
-                        <p id="profileLevel">Lv.1 科普新手</p>
-                        <div class="exp-bar">
-                            <div class="exp-bar-inner" id="profileExpBar"></div>
-                        </div>
-                        <div class="exp-progress" id="profileExpProgress">0 / 10 EXP</div>
-                    </div>
-
-                    <!-- 福利兑换 -->
-                    <div class="section-title">🎁 福利兑换（可用经验：<span id="profileUserExp">0</span>）</div>
-                    <div class="welfare-list" id="profileWelfareList"></div>
-
-                    <!-- 历史记录 -->
-                    <div class="section-title">📋 最近完成</div>
-                    <div class="history-list" id="profileHistoryList"></div>
-
-                    <!-- 统计数据 -->
-                    <div class="section-title">📊 使用数据</div>
-                    <div class="data-grid">
-                        <div class="data-item">
-                            <div class="num" id="profileStatOpens">0</div>
-                            <div class="label">累计打开</div>
-                        </div>
-                        <div class="data-item">
-                            <div class="num" id="profileStatRefresh">0</div>
-                            <div class="label">任务刷新</div>
-                        </div>
-                        <div class="data-item">
-                            <div class="num" id="profileStatComplete">0</div>
-                            <div class="label">完成次数</div>
-                        </div>
-                        <div class="data-item">
-                            <div class="num" id="profileStatSkip">0</div>
-                            <div class="label">跳过次数</div>
-                        </div>
-                    </div>
-
-                    <!-- 错题复盘模块 -->
-                    <div class="section-title" style="margin-top: 24px;">📚 错题复盘</div>
-                    <div id="errorReviewPanel"></div>
-                </div>
-            </section>
-        </main>
-    </div>
-
-<!-- ============【修改：底部导航初始隐藏 app‑hide】============ -->
-    <nav class="bottom-nav app-hide" id="mainNav">
-        <button class="nav-item active" data-page="home">
-            <span class="nav-icon">🎯</span>
-            <span class="nav-label">任务</span>
-        </button>
-        <button class="nav-item" data-page="discover">
-            <span class="nav-icon">🧬</span>
-            <span class="nav-label">合成</span>
-        </button>
-        <button class="nav-item" data-page="rank">
-            <span class="nav-icon">🏆</span>
-            <span class="nav-label">排行</span>
-        </button>
-        <button class="nav-item" data-page="profile" id="btnProfileNav">
-            <span class="nav-icon">👤</span>
-            <span class="nav-label">我的</span>
-        </button>
-    </nav>
-
-    <!-- 原有脚本加载 全部保留不动 -->
-    <script src="js/mascot.js"></script>
-    <script src="js/backgrounds.js"></script>
-    <script src="js/decorations.js"></script>
-    <script src="js/tasks.js"></script>
-    <script src="js/error-review/error-store.js"></script>
-    <script src="js/error-review/error-renderer.js"></script>
-    <script src="js/error-review/error-charts.js"></script>
-    <script src="js/puzzle/puzzle-engine.js"></script>
-    <script src="js/share/share-engine.js"></script>
-    <script src="js/rank/rank-engine.js"></script>
-    <script src="js/verification.js"></script>
-    <script src="js/app.js"></script>
-
-<!-- ============【新增内联JS：登录逻辑 + 成都景点数据集 + 福利兑换配置&渲染】============ -->
 <script>
-// ---------------------- 1.成都旅游景点知识碎片数据集（内联，不再单独chengdu‑map.js）
-window.CHENGDU_SCENIC = [
-    {id:1,name:"宽窄巷子",desc:"成都老成都民居文化地标，川西院落古街"},
-    {id:2,name:"锦里古街",desc:"毗邻武侯祠，三国文化风情古商业街"},
-    {id:3,name:"大熊猫繁育研究基地",desc:"国宝大熊猫核心观赏园区，城市名片"},
-    {id:4,name:"武侯祠",desc:"纪念三国蜀汉丞相诸葛亮的历史祠堂"},
-    {id:5,name:"杜甫草堂",desc:"唐代大诗人杜甫在成都的故居旧址"},
-    {id:6,name:"青羊宫",desc:"成都历史悠久的道教古观，道教文化圣地"},
-    {id:7,name:"东郊记忆",desc:"旧工业厂房改造而成文创艺术园区"},
-    {id:8,name:"望江楼公园",desc:"纪念唐代女诗人薛涛，以竹林景观闻名"},
-    {id:9,name:"都江堰",desc:"世界文化遗产，两千多年古代水利工程"},
-    {id:10,name:"青城山",desc:"世界文化遗产，国内知名道教名山"}
-];
-//合并进拼图引擎题库
-if(window.PUZZLE_FRAGMENTS){
-    window.PUZZLE_FRAGMENTS = [...window.PUZZLE_FRAGMENTS,...window.CHENGDU_SCENIC];
-}else{
-    window.PUZZLE_FRAGMENTS = [...window.CHENGDU_SCENIC];
-}
+// ========== Logto配置，请修改为你自己部署的Logto域名、Web AppID ==========
+const logtoConfig = {
+  endpoint: "https://你的-logto域名",
+  appId: "替换为你的web应用App ID",
+};
+const logtoClient = new LogtoBrowser.LogtoClient(logtoConfig);
 
-// ----------------------2.福利兑换全局配置（6项）
-window.QIZHI_WELFARE_CONFIG = [
-    {title:"以物换物",exp:20,desc:"消耗20经验，社区物品互换"},
-    {title:"制作6个电子专属表情包",exp:120,desc:"生成一套6张个人电子表情包素材包"},
-    {title:"制作一张电子海报",exp:180,desc:"AI生成专属科普主题电子海报"},
-    {title:"制作一张电子明信片",exp:150,desc:"生成电子科普明信片，支持保存图片"},
-    {title:"撰写1000字你的故事",exp:400,desc:"AI辅助完成1000字个人科普小故事文稿"},
-    {title:"申请1次科普讲座",exp:800,desc:"兑换1场社区科普讲座活动申请资格"}
-];
-
-//福利渲染函数
-function getUserExp(){
-    const el = document.getElementById("userExp");
-    if(!el) return 0;
-    const str = el.innerText.replace(/[^0-9]/g,"");
-    return Number(str)||0;
-}
-function renderWelfareList(){
-    const container = document.getElementById("profileWelfareList");
-    if(!container || !window.QIZHI_WELFARE_CONFIG) return;
-    const arr = window.QIZHI_WELFARE_CONFIG;
-    const exp = getUserExp();
-    container.innerHTML = "";
-    arr.forEach(item=>{
-        const div = document.createElement("div");
-        div.className="welfare-item";
-        div.innerHTML = `
-            <div class="w-title">${item.title}</div>
-            <div class="w-desc">${item.desc}</div>
-            <div class="w-exp">消耗：${item.exp} 经验</div>
-            <button class="welfare-btn" ${exp >= item.exp ? "" : "disabled"}>立即兑换</button>
-        `;
-        container.appendChild(div);
-    })
-}
-
-//页面切换钩子，切到个人中心执行渲染（监听页面切换）
-document.querySelectorAll(".nav-item").forEach(btn=>{
-    btn.addEventListener("click",function(){
-        const page = this.dataset.page;
-        if(page === "profile"){
-            setTimeout(renderWelfareList,50);
-        }
-    })
-})
-
-// ----------------------3.登录注册逻辑
 const loginMask = document.getElementById('loginMask');
 const mainApp = document.getElementById('mainApp');
 const mainNav = document.getElementById('mainNav');
-const loginTitle = document.getElementById('loginTitle');
-const switchLoginRegister = document.getElementById('switchLoginRegister');
-const btnSendCode = document.getElementById('btnSendCode');
-const btnSubmitLogin = document.getElementById('btnSubmitLogin');
-let isRegisterMode = false;
+const btnGuest = document.getElementById('btnGuest');
 
-//读取本地登录态
-const localUser = localStorage.getItem("qizhi_user");
-if(localUser){
+// 游客模式标记常量
+const GUEST_MARKER = "qizhi_guest";
+
+/**
+ * 检查登录状态
+ */
+async function checkAuthStatus() {
+    // 判断是否游客模式
+    const guestFlag = localStorage.getItem(GUEST_MARKER);
+    if(guestFlag === "1"){
+        loginMask.style.display="none";
+        mainApp.classList.remove("app-hide");
+        mainNav.classList.remove("app-hide");
+        return;
+    }
+
+    const isAuth = await logtoClient.isAuthenticated();
+    if(isAuth){
+        // Logto已登录，获取用户信息
+        const userInfo = await logtoClient.getUserInfo();
+        console.log("登录用户手机号：", userInfo.primaryPhone);
+        loginMask.style.display="none";
+        mainApp.classList.remove("app-hide");
+        mainNav.classList.remove("app-hide");
+    }else{
+        // 未登录，跳转Logto托管登录页面（只有登录，无注册入口）
+        await logtoClient.signIn(window.location.origin + window.location.pathname);
+    }
+}
+
+//页面加载，处理回调code
+window.onload = async function(){
+    const params = new URLSearchParams(window.location.search);
+    if(params.has("code")){
+        await logtoClient.handleSignInCallback();
+        //清理url上的code参数
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+    await checkAuthStatus();
+}
+
+//游客模式按钮
+btnGuest.onclick = function(){
+    localStorage.setItem(GUEST_MARKER,"1");
     loginMask.style.display="none";
     mainApp.classList.remove("app-hide");
     mainNav.classList.remove("app-hide");
 }
 
-//切换登录注册模式
-switchLoginRegister.onclick = ()=>{
-    isRegisterMode = !isRegisterMode;
-    loginTitle.innerText = isRegisterMode ? "账号注册":"账号登录";
-    switchLoginRegister.innerText = isRegisterMode ? "切换到账号登录":"切换到注册账号";
+/**
+ * 工具函数：业务层判断是否游客，在任务提交、福利兑换按钮调用
+ * @returns {boolean} true=游客，需要弹窗拦截操作
+ */
+function isGuestUser(){
+    return localStorage.getItem(GUEST_MARKER) === "1";
 }
 
-//获取验证码（模拟，正式替换后端接口）
-btnSendCode.onclick = async ()=>{
-    const phone = document.getElementById("phoneInput").value.trim();
-    if(!/^1[3-9]\d{9}$/.test(phone)){
-        alert("请输入正确11位手机号");
-        return;
-    }
-    //fetch("/api/user/sendCode",{method:"POST",body:JSON.stringify({phone})})
-    alert("【模拟】验证码已下发，正式环境对接短信服务");
+//示例：兑换按钮点击之前调用
+/*
+if(isGuestUser()){
+    alert("游客模式仅支持浏览，请使用分配的账号密码登录，参与任务与福利兑换");
+    return;
 }
-
-//提交登录注册
-btnSubmitLogin.onclick = async ()=>{
-    const phone = document.getElementById("phoneInput").value.trim();
-    const code = document.getElementById("codeInput").value.trim();
-    const email = document.getElementById("emailInput").value.trim();
-    if(!phone||!code){
-        alert("手机号、验证码不能为空");
-        return;
-    }
-    // const res = await fetch("/api/user/loginOrRegister",{method:"POST",body:JSON.stringify({phone,code,email})});
-    // const ret = await res.json(); if(!ret.success){alert(ret.msg);return;}
-
-    localStorage.setItem("qizhi_user",JSON.stringify({phone,email}));
-    loginMask.style.display="none";
-    mainApp.classList.remove("app-hide");
-    mainNav.classList.remove("app-hide");
-}
+*/
 </script>
-</body>
-</html>
