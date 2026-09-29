@@ -3185,5 +3185,85 @@ body {
         font-size: 22px;
     }
 }
+/*---------- 【追加：登录注册弹窗新增样式，放在style.css文件末尾】---------- */
+.login-mask{
+    position: fixed;
+    top:0;left:0;right:0;bottom:0;
+    background:rgba(0,0,0,0.75);
+    z-index:9999;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:16px;
+}
+.login-box{
+    width:100%;
+    max-width:360px;
+    background:var(--pb-surface);
+    border:2.5px solid var(--pb-stroke-color);
+    border-radius:var(--pb-radius-blob);
+    padding:24px;
+    box-sizing:border-box;
+    box-shadow:var(--pb-shadow-float);
+}
+.login-box h2{
+    text-align:center;
+    margin:0 0 20px;
+    color:var(--pb-text);
+    font-size:20px;
+}
+.input-row{
+    margin-bottom:14px;
+}
+.input-row input{
+    width:100%;
+    box-sizing:border-box;
+    border:2px solid var(--pb-border);
+    border-radius:12px;
+    padding:12px 14px;
+    font-size:15px;
+    background:var(--pb-surface);
+    color:var(--pb-text);
+}
+.code-row{
+    display:flex;
+    gap:10px;
+}
+.code-row input{flex:1;}
+.btn-get-code{
+    white-space:nowrap;
+    padding:0 14px;
+    background:var(--pb-secondary);
+    color:white;
+    border:none;
+    border-radius:12px;
+    font-size:14px;
+    cursor:pointer;
+}
+.btn-login,.btn-register{
+    width:100%;
+    padding:13px;
+    border:none;
+    border-radius:12px;
+    background:var(--pb-primary);
+    color:#fff;
+    font-size:16px;
+    margin-top:8px;
+    cursor:pointer;
+}
+.tab-switch{
+    text-align:center;
+    margin-top:16px;
+    color:var(--pb-secondary-dark);
+}
+.tab-switch span{
+    cursor:pointer;
+}
+.app-hide{
+    display:none !important;
+}
+.login-tip-text{
+    margin-top:12px;font-size:12px;color:var(--pb-text-muted);text-align:center;
+}
 
 
