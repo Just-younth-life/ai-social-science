@@ -243,13 +243,6 @@ document.querySelectorAll(".nav-item").forEach(btn=>{
     })
 })
 
-// =====================3、Logto 方案B 配置 【务必修改下面两处为你的真实部署参数】 =====================
-const logtoConfig = {
-  endpoint: "https://替换为你的logto部署域名",
-  appId: "替换为你的web应用App ID",
-};
-const logtoClient = new LogtoBrowser.LogtoClient(logtoConfig);
-
 const loginMask = document.getElementById('loginMask');
 const mainApp = document.getElementById('mainApp');
 const mainNav = document.getElementById('mainNav');
@@ -276,42 +269,61 @@ function openMainUi(){
  * 登录状态校验，只做检测，**不会自动跳转登录**
  */
 async function checkAuthStatus() {
-    //游客标记优先
-    const guestFlag = localStorage.getItem(GUEST_MARKER);
-    if(guestFlag === "1"){
-        openMainUi();
-        return;
-    }
-    const isAuth = await logtoClient.isAuthenticated();
-    if(isAuth){
-        const userInfo = await logtoClient.getUserInfo();
-        console.log("登录用户手机号：", userInfo.primaryPhone);
-        openMainUi();
-    }else{
-        //未登录：保持弹窗，不做任何跳转
+    try{
+        //游客标记优先
+        const guestFlag = localStorage.getItem(GUEST_MARKER);
+        if(guestFlag === "1"){
+            openMainUi();
+            return;
+        }
+        const isAuth = await logtoClient.isAuthenticated();
+        if(isAuth){
+            const userInfo = await logtoClient.getUserInfo();
+            console.log("登录用户手机号：", userInfo.primaryPhone);
+            openMainUi();
+        }else{
+            //未登录：停留在弹窗
+            loginMask.style.display="flex";
+        }
+    }catch(err){
+        console.error("状态检测异常",err);
         loginMask.style.display="flex";
     }
 }
 
-//【点击按钮才去登录】
+//【前往登录按钮点击事件，增加try-catch捕获报错】
 btnLoginGo.onclick = async function(){
-    await logtoClient.signIn(window.location.origin + window.location.pathname);
+    try{
+        await logtoClient.signIn(window.location.origin + window.location.pathname);
+    }catch(e){
+        alert("跳转登录失败，请检查网络与Logto配置");
+        console.error(e);
+    }
 };
 
-//游客模式按钮
+//游客模式按钮点击事件
 btnGuest.onclick = function(){
-    localStorage.setItem(GUEST_MARKER,"1");
-    openMainUi();
+    try{
+        localStorage.setItem(GUEST_MARKER,"1");
+        openMainUi();
+    }catch(e){
+        alert("游客模式进入失败");
+        console.error(e);
+    }
 }
 
 //页面onload，处理OAuth回调code（登录成功跳转回来的时候执行）
 window.onload = async function(){
-    const params = new URLSearchParams(window.location.search);
-    if(params.has("code")){
-        await logtoClient.handleSignInCallback();
-        window.history.replaceState({}, document.title, window.location.pathname);
+    try{
+        const params = new URLSearchParams(window.location.search);
+        if(params.has("code")){
+            await logtoClient.handleSignInCallback();
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+        await checkAuthStatus();
+    }catch(err){
+        console.error("页面初始化异常",err);
     }
-    await checkAuthStatus();
 }
 </script>
 </body>
