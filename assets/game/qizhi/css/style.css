@@ -3266,6 +3266,7 @@ body {
     margin-top:12px;font-size:12px;color:var(--pb-text-muted);text-align:center;
 }
 /*---------- 【追加：登录弹窗新增样式，放在style.css文件最末尾】---------- */
+/*登录弹窗整体样式*/
 .login-mask{
     position: fixed;
     top:0;left:0;right:0;bottom:0;
@@ -3278,121 +3279,50 @@ body {
 }
 .login-box{
     width:100%;
-    max-width:360px;
-    background:var(--pb-surface);
-    border:2.5px solid var(--pb-stroke-color);
-    border-radius:var(--pb-radius-blob);
-    padding:28px 24px;
+    max-width:520px;
+    background:#ffffff;
+    border-radius:22px;
+    padding:32px 28px;
     box-sizing:border-box;
-    box-shadow:var(--pb-shadow-float);
+    box-shadow:0 8px 32px rgba(0,0,0,0.15);
 }
 .login-box h2{
     text-align:center;
     margin:0 0 12px;
-    color:var(--pb-text);
-    font-size:20px;
+    color:#442c2e;
+    font-size:24px;
 }
 .login-desc{
     text-align:center;
-    font-size:14px;
-    color:var(--pb-text-muted);
+    font-size:16px;
+    color:#8c7274;
     margin-bottom:24px;
     line-height:1.5;
 }
-.divider-line{
-    margin:20px 0;
-    height:1px;
-    background-color:var(--pb-border-dashed);
-}
-.btn-guest{
-    width:100%;
-    padding:12px;
-    border:2px solid var(--pb-border);
-    border-radius:12px;
-    background:var(--pb-bg-soft);
-    color:var(--pb-text);
-    font-size:15px;
-    cursor:pointer;
-}
-.login-tip-text{
-    margin-top:16px;
-    font-size:12px;
-    color:var(--pb-text-muted);
-    text-align:center;
-    line-height:1.5;
-}
-.app-hide{
-    display:none !important;
-}
-/*---------- 【追加：登录弹窗新增样式，放在style.css文件最末尾】---------- */
-.login-mask{
-    position: fixed;
-    top:0;left:0;right:0;bottom:0;
-    background:rgba(0,0,0,0.75);
-    z-index:9999;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:16px;
-}
-.login-box{
-    width:100%;
-    max-width:360px;
-    background:var(--pb-surface);
-    border:2.5px solid var(--pb-stroke-color);
-    border-radius:var(--pb-radius-blob);
-    padding:28px 24px;
-    box-sizing:border-box;
-    box-shadow:var(--pb-shadow-float);
-}
-.login-box h2{
-    text-align:center;
-    margin:0 0 12px;
-    color:var(--pb-text);
-    font-size:20px;
-}
-.login-desc{
-    text-align:center;
-    font-size:14px;
-    color:var(--pb-text-muted);
-    margin-bottom:24px;
-    line-height:1.5;
-}
-.btn-login-go{
+/*统一按钮样式（浅黄色，和截图游客按钮一致）*/
+.btn-action{
     width:100%;
     padding:14px;
-    border:none;
-    border-radius:12px;
-    background-color:#07C160;
-    color:#ffffff;
+    border:2px solid #d9c9ca;
+    border-radius:14px;
+    background:#fff9e8;
+    color:#442c2e;
     font-size:16px;
-    font-weight:bold;
     cursor:pointer;
+    margin: 6px 0;
 }
 .divider-line{
-    margin:20px 0;
+    margin:12px 0;
     height:1px;
-    background-color:var(--pb-border-dashed);
-}
-.btn-guest{
-    width:100%;
-    padding:12px;
-    border:2px solid var(--pb-border);
-    border-radius:12px;
-    background:var(--pb-bg-soft);
-    color:var(--pb-text);
-    font-size:15px;
-    cursor:pointer;
+    background-color:#d9c9ca;
 }
 .login-tip-text{
-    margin-top:16px;
-    font-size:12px;
-    color:var(--pb-text-muted);
+    margin-top:20px;
+    font-size:14px;
+    color:#8c7274;
     text-align:center;
-    line-height:1.5;
+    line-height:1.6;
 }
 .app-hide{
     display:none !important;
 }
-
-
