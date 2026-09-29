@@ -14,19 +14,19 @@
     <script src="https://cdn.jsdelivr.net/npm/@logto/browser@2.20.0/dist/logto.browser.min.js"></script>
 </head>
 <body class="theme-general">
-<!-- ============【登录弹窗，方案B：跳转Logto托管登录，仅游客按钮】============ -->
+<!-- ============【登录弹窗：本地弹窗，不自动跳转】============ -->
 <div class="login-mask" id="loginMask">
     <div class="login-box">
         <h2>欢迎来到启知科普游戏</h2>
         <div class="login-desc">
-            内测版本，账号由杉板桥社区统一分配<br>
-            打开页面将自动跳转登录页，请输入社区给到的手机号与密码
+            内测版本，账号由杉板桥社区后台统一创建<br/>
+            测试账号：手机号 15982439838，密码 qweee
         </div>
+        <button class="btn-login-go" id="btnLoginGo">🔐 前往登录（输入分配账号密码）</button>
         <div class="divider-line"></div>
-        <button class="btn-guest" id="btnGuest">游客模式（仅浏览，数据不保存，不可做任务兑换）</button>
+        <button class="btn-guest" id="btnGuest">👀游客模式（仅浏览，数据不保存，不可做任务兑换）</button>
         <div class="login-tip-text">
-            内测测试账号：手机号15982439838 密码 qweee<br>
-            正式账号请到杉板桥党群服务中心领取
+            正式使用请到杉板桥党群服务中心领取账号
         </div>
     </div>
 </div>
@@ -255,6 +255,7 @@ const loginMask = document.getElementById('loginMask');
 const mainApp = document.getElementById('mainApp');
 const mainNav = document.getElementById('mainNav');
 const btnGuest = document.getElementById('btnGuest');
+const btnLoginGo = document.getElementById('btnLoginGo');
 const GUEST_MARKER = "qizhi_guest";
 
 /**
@@ -265,32 +266,46 @@ function isGuestUser(){
     return localStorage.getItem(GUEST_MARKER) === "1";
 }
 
+/** 打开主应用界面 */
+function openMainUi(){
+    loginMask.style.display="none";
+    mainApp.classList.remove("app-hide");
+    mainNav.classList.remove("app-hide");
+}
+
 /**
- * 登录状态校验
+ * 登录状态校验，只做检测，**不会自动跳转登录**
  */
 async function checkAuthStatus() {
     //游客标记优先
     const guestFlag = localStorage.getItem(GUEST_MARKER);
     if(guestFlag === "1"){
-        loginMask.style.display="none";
-        mainApp.classList.remove("app-hide");
-        mainNav.classList.remove("app-hide");
+        openMainUi();
         return;
     }
     const isAuth = await logtoClient.isAuthenticated();
     if(isAuth){
         const userInfo = await logtoClient.getUserInfo();
         console.log("登录用户手机号：", userInfo.primaryPhone);
-        loginMask.style.display="none";
-        mainApp.classList.remove("app-hide");
-        mainNav.classList.remove("app-hide");
+        openMainUi();
     }else{
-        //未登录跳转logto托管登录页面（关闭自助注册，仅登录）
-        await logtoClient.signIn(window.location.origin + window.location.pathname);
+        //未登录：保持弹窗，不做任何跳转
+        loginMask.style.display="flex";
     }
 }
 
-//页面onload，处理OAuth回调code
+//【点击按钮才去登录】
+btnLoginGo.onclick = async function(){
+    await logtoClient.signIn(window.location.origin + window.location.pathname);
+};
+
+//游客模式按钮
+btnGuest.onclick = function(){
+    localStorage.setItem(GUEST_MARKER,"1");
+    openMainUi();
+}
+
+//页面onload，处理OAuth回调code（登录成功跳转回来的时候执行）
 window.onload = async function(){
     const params = new URLSearchParams(window.location.search);
     if(params.has("code")){
@@ -298,14 +313,6 @@ window.onload = async function(){
         window.history.replaceState({}, document.title, window.location.pathname);
     }
     await checkAuthStatus();
-}
-
-//游客模式按钮
-btnGuest.onclick = function(){
-    localStorage.setItem(GUEST_MARKER,"1");
-    loginMask.style.display="none";
-    mainApp.classList.remove("app-hide");
-    mainNav.classList.remove("app-hide");
 }
 </script>
 </body>
